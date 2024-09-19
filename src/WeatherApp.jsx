@@ -70,69 +70,6 @@ function WeatherApp() {
     }
   }, [data]);
 
-  //Handles the dynamic icon change for varying weather descriptions
-  // useEffect(() => {
-  //   if (data.list) {
-  //     switch (data.list[0].weather[0].main) {
-  //       case 'Clouds':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-cloud"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Rain':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-cloud-rain-heavy"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Thunderstorm':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-cloud-lightning-rain"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Drizzle':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-cloud-drizzle"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Snow':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-snow3"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Mist':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-water"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       case 'Clear':
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-circle"></i>
-  //           </i>
-  //         );
-  //         break;
-  //       default:
-  //         setIcon(
-  //           <i>
-  //             <i class="bi bi-cloud"></i>
-  //           </i>
-  //         );
-  //     }
-  //   }
-  // }, [data]);
-
   //Function for dynamic icons change for varying weather descriptions (for 3hour forecast)
   const getIcon = (weatherName) => {
     if (data.list) {
@@ -189,11 +126,44 @@ function WeatherApp() {
     }
   };
 
+  //Handles the conversion of degree angle to wind direction
+  const angleToDirection = (angle) => {
+    // Normalize the angle to be within [0, 360) degrees
+    angle = angle % 360;
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    // Define the 16-point compass directions
+    const directions = [
+      'N', // 0°
+      'NNE', // 22.5°
+      'NE', // 45°
+      'ENE', // 67.5°
+      'E', // 90°
+      'ESE', // 112.5°
+      'SE', // 135°
+      'SSE', // 157.5°
+      'S', // 180°
+      'SSW', // 202.5°
+      'SW', // 225°
+      'WSW', // 247.5°
+      'W', // 270°
+      'WNW', // 292.5°
+      'NW', // 315°
+      'NNW', // 337.5°
+    ];
+
+    const index = Math.round(angle / 22.5) % 16;
+
+    return directions[index];
+  };
   //Handles the current Date and Time
-  const getFormattedDateTime = () => {
+  const getFormattedDateTime = (gmtTime) => {
     const now = new Date();
     const date = now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
     const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
     return { date, time };
   };
 
@@ -201,6 +171,13 @@ function WeatherApp() {
 
   //Still needs code for converting Unix timestamp to PH timezone
   //for readable 3hour weawther forecast
+  const GMTToLocalTime = (gmtTime) => {
+    const date = new Date(gmtTime + ' GMT');
+    const localDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    const localTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    return `${localDate} ${localTime}`;
+  };
 
   return (
     <>
@@ -253,15 +230,15 @@ function WeatherApp() {
 
             <h4 className="fw-light">
               <i className="bi bi-arrows-collapse"></i>
-              {data.list ? ` Pressure: ${data.list[0].main.pressure} mb` : null}
+              {data.list ? ` Pressure: ${data.list[0].main.pressure} hPa` : null}
             </h4>
             <h4 className="fw-light">
               <i className="bi bi-eye"></i>
-              {data.list ? ` Visibility: ${data.list[0].visibility}` : null}
+              {data.list ? ` Visibility: ${data.list[0].visibility / 1000} km` : null}
             </h4>
             <h4 className="fw-light">
               <i className="bi bi-wind"></i>
-              {data.list ? ` ${data.list[0].wind.deg}°, Speed: ${data.list[0].wind.speed} km/h` : null}
+              {data.list ? ` ${angleToDirection(data.list[0].wind.deg)}, Speed: ${data.list[0].wind.speed} m/s` : null}
             </h4>
           </div>
           <div className="weatherToday mt-4 pt-2">
@@ -281,7 +258,7 @@ function WeatherApp() {
           <div className="hourly-scroll d-flex justify-content-evenly gap-2">
             {/* 1st Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[0].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[0].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[0].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[0].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[0].main.temp.toFixed()}°C` : null}</h3>
@@ -292,7 +269,7 @@ function WeatherApp() {
             </div>
             {/* 2nd Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[1].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[1].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[1].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[1].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[1].main.temp.toFixed()}°C` : null}</h3>
@@ -303,7 +280,7 @@ function WeatherApp() {
             </div>
             {/* 3rd Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[2].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[2].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[2].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[2].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[2].main.temp.toFixed()}°C` : null}</h3>
@@ -314,7 +291,7 @@ function WeatherApp() {
             </div>
             {/* 4th Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[3].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[3].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[3].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[3].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[3].main.temp.toFixed()}°C` : null}</h3>
@@ -325,7 +302,7 @@ function WeatherApp() {
             </div>
             {/* 5th Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[4].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[4].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[4].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[4].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[4].main.temp.toFixed()}°C` : null}</h3>
@@ -336,7 +313,7 @@ function WeatherApp() {
             </div>
             {/* 6th Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[5].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[5].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[5].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[5].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[5].main.temp.toFixed()}°C` : null}</h3>
@@ -347,7 +324,7 @@ function WeatherApp() {
             </div>
             {/* 7th Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[6].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[6].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[6].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[6].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[6].main.temp.toFixed()}°C` : null}</h3>
@@ -358,7 +335,7 @@ function WeatherApp() {
             </div>
             {/* 8th Hour */}
             <div className="hourly-container p-1 mb-3 text-center">
-              <h4 className="fw-lighter fs-5">{data.list ? data.list[7].dt_txt : null}</h4>
+              <h4 className="fw-lighter fs-5">{data.list ? GMTToLocalTime(data.list[7].dt_txt) : null}</h4>
               <h4>{data.list ? getIcon(data.list[7].weather[0].main) : null}</h4>
               <h4 className="fw-lighter text-center">{data.list ? data.list[7].weather[0].description : null}</h4>
               <h3 className="fw-light">{data.list ? `${data.list[7].main.temp.toFixed()}°C` : null}</h3>

@@ -3,6 +3,7 @@
   font-family: 'Poppins', sans-serif;
 }
 body {
+  background-color: #43484d;
   color: #f0f0f0 !important;
 }
 .background {
@@ -15,7 +16,7 @@ span {
   color: #43484d;
 }
 .search-bar {
-  color: #f0f0f0 !important;
+  color: #f8f8f8 !important;
   border-color: #43484d !important;
   border-radius: 50px !important;
   backdrop-filter: blur(8px);
