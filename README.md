@@ -1,8 +1,3 @@
-# React + Vite
+# WeatherBoy, a weather App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This web app is built using Vite + React.js. The fetched data comes from openweathermap.org API, which utilizes Axios for handling HTTP requests. The website design uses Bootstrap, Bootstrap icons, and Font Awesome Icons. 
