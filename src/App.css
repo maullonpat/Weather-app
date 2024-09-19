@@ -16,8 +16,9 @@ span {
 }
 .search-bar {
   color: #f0f0f0 !important;
-  border-color: #6c757d !important;
+  border-color: #43484d !important;
   border-radius: 50px !important;
+  backdrop-filter: blur(8px);
 }
 .search-bar::placeholder {
   color: #f8f8f8 !important;
