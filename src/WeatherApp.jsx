@@ -29,7 +29,7 @@ function WeatherApp() {
   }, []);
 
   //Handles the searching of location
-  c; //Handles the searching of location
+
   const searchLocation = (event) => {
     if (event.key === 'Enter') {
       axios.get(url).then((response) => {
