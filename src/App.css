@@ -38,3 +38,8 @@ span {
 .hourly-scroll {
   overflow-x: auto;
 }
+
+.search-item {
+  list-style: none;
+  text-align: center;
+}
