@@ -17,7 +17,6 @@ function WeatherApp() {
 
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&appid=59e417ee8ca618acb36c2d7cdda25a97`;
   const defaultLocation = `https://api.openweathermap.org/data/2.5/forecast?q=manila&units=metric&appid=59e417ee8ca618acb36c2d7cdda25a97`;
-  const geo = `http://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=5&appid=59e417ee8ca618acb36c2d7cdda25a97`;
 
   //Handles the default location displayed in the app (set to Manila, PH)
   useEffect(() => {
@@ -30,9 +29,10 @@ function WeatherApp() {
   }, []);
 
   //Handles the searching of location
+  c; //Handles the searching of location
   const searchLocation = (event) => {
     if (event.key === 'Enter') {
-      axios.get(geo).then((response) => {
+      axios.get(url).then((response) => {
         setData(response.data);
         console.log(response.data);
       });
