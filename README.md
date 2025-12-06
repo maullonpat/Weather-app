@@ -4,3 +4,4 @@ This web app is built using Vite + React.js. The fetched data comes from openwea
 ![WeatherBoy](https://i.imgur.com/qzpwgv2.png)
 
 Link: https://weatherboy.vercel.app/
+https://pop-validation.vercel.app/
